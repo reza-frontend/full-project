@@ -8,7 +8,7 @@ MODEL = os.environ.get('GEMINI_TTS_MODEL', 'gemini-3.8-flash-tts')
 VOICE = os.environ.get('GEMINI_VOICE', 'Charon')
 SR = 24000
 here = os.path.dirname(os.path.abspath(__file__))
-TL = json.loads(subprocess.check_output(['node', '-e', f"console.log(JSON.stringify(require('{here}/timeline.js')))"]))
+TL = json.loads(subprocess.check_output(['node', '-e', f"console.log(JSON.stringify(require('{here.replace(os.sep, '/')}/timeline.js')))"]))
 
 def tts(text):
     body = {"contents": [{"parts": [{"text": "با لحن صمیمی، پرانرژی و طبیعی مثل گوینده‌ی ریلز اینستاگرام، به فارسی بگو: " + text}]}],
