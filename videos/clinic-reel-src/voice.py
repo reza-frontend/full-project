@@ -4,7 +4,7 @@ Usage: GEMINI_API_KEY=... python3 voice.py  -> writes voice.wav (24 kHz mono, fu
 import base64, json, os, re, subprocess, sys, urllib.request, wave
 
 KEY = os.environ['GEMINI_API_KEY']
-MODEL = os.environ.get('GEMINI_TTS_MODEL', 'gemini-2.5-flash-preview-tts')
+MODEL = os.environ.get('GEMINI_TTS_MODEL', 'gemini-3.8-flash-tts')
 VOICE = os.environ.get('GEMINI_VOICE', 'Charon')
 SR = 24000
 here = os.path.dirname(os.path.abspath(__file__))
