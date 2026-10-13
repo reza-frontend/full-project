@@ -1,0 +1,23 @@
+{
+  "name": "reel-render-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Renders vertical Instagram reels (Persian captions, hook card, CTA) from a JSON spec. Called by the REEL_* n8n workflows.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "studio": "remotion studio src/index.js",
+    "test-render": "node scripts/test-render.js"
+  },
+  "dependencies": {
+    "@fontsource/lalezar": "5.3.0",
+    "@fontsource/vazirmatn": "5.3.0",
+    "@remotion/bundler": "4.0.535",
+    "@remotion/cli": "4.0.535",
+    "@remotion/renderer": "4.0.535",
+    "express": "5.3.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.535"
+  }
+}

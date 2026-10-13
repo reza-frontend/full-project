@@ -1,0 +1,18 @@
+services:
+  reel-render:
+    build: .
+    container_name: reel-render
+    restart: unless-stopped
+    ports:
+      - "3900:3900"
+    environment:
+      API_KEY: ${REEL_RENDER_API_KEY:?set REEL_RENDER_API_KEY in .env}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?set OPENROUTER_API_KEY in .env}
+      PUBLIC_URL: ${REEL_PUBLIC_URL:-http://localhost:3900}
+      RETENTION_DAYS: "30"
+      # RENDER_CONCURRENCY: "2"   # lower it if the server also runs heavy n8n jobs
+    volumes:
+      - reel-data:/data
+    shm_size: "1gb"
+volumes:
+  reel-data:
