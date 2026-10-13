@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>استودیو ریل</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--text:#e9ecf1;--muted:#9aa3b2;--accent:#ffd400;--accent-ink:#141414;--ok:#2ecc71;--bad:#ff5d5d;--warn:#ffb020;--radius:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Vazirmatn,Tahoma,sans-serif;font-size:15px;line-height:1.7}
+a{color:var(--accent)}
+header{position:sticky;top:0;z-index:5;background:rgba(15,17,21,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.top{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{font-weight:900;font-size:19px}.brand span{color:var(--accent)}
+nav{display:flex;gap:6px;overflow-x:auto}
+nav button{background:none;border:0;color:var(--muted);padding:8px 12px;border-radius:10px;font:inherit;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--card);color:var(--text)}
+main{padding:20px 0 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px;color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+input,textarea,select{width:100%;background:#0c0e12;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit}
+textarea{min-height:90px;resize:vertical}
+input[type=color]{padding:2px;height:42px}
+input[type=checkbox]{width:auto}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.row{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.bad{background:var(--bad);color:#fff}.btn.ok{background:var(--ok);color:#06210f}
+.btn:disabled{opacity:.5;cursor:wait}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.modes{grid-template-columns:1fr}}
+.mode{border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
+.mode.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.mode b{display:block}.mode small{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;display:flex;flex-direction:column}
+.thumb{aspect-ratio:9/16;max-height:300px;background:#000;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.thumb video{width:100%;height:100%;object-fit:cover}
+.pbody{padding:12px}
+.pbody b{display:block;font-size:14px}
+.badge{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;background:#2a2f3a;color:var(--text);margin-top:6px}
+.badge.review{background:var(--accent);color:var(--accent-ink)}.badge.approved{background:var(--ok);color:#06210f}
+.badge.failed,.badge.rejected{background:var(--bad);color:#fff}.badge.busy{background:var(--warn);color:#241600}
+.muted{color:var(--muted);font-size:13px}
+.scene{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.scene .n{font-weight:900;color:var(--accent)}
+.scores{display:flex;flex-wrap:wrap;gap:8px}.scores span{background:#0c0e12;border:1px solid var(--line);border-radius:99px;padding:2px 12px;font-size:13px}
+.imgs{display:flex;flex-wrap:wrap;gap:10px}
+.img{width:120px}.img img{width:120px;height:120px;object-fit:cover;border-radius:10px;display:block}
+.img input{margin-top:4px;font-size:12px;padding:6px}
+.x{background:none;border:0;color:var(--bad);cursor:pointer;font:inherit;font-size:12px}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;z-index:20;overflow:auto;padding:24px 12px}
+#modal .box{max-width:860px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:18px}
+.vid{display:flex;gap:16px;flex-wrap:wrap}.vid video{width:280px;max-width:100%;border-radius:12px;background:#000}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;border:1px solid var(--line);padding:10px 18px;border-radius:12px;display:none;z-index:30}
+.hide{display:none!important}
+.login{max-width:420px;margin:12vh auto}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+  <div class="brand">استودیو <span>ریل</span></div>
+  <nav id="tabs" class="hide">
+    <button data-t="new" class="on">ساخت ویدیو</button>
+    <button data-t="list">ویدیوها</button>
+    <button data-t="kit">سبک برند</button>
+    <button data-t="settings">تنظیمات</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section id="login" class="card login">
+    <h2>ورود</h2>
+    <label>کلید پنل</label>
+    <input id="keyIn" type="password" autocomplete="current-password">
+    <div class="actions"><button class="btn" id="loginBtn">ورود</button></div>
+    <p class="muted">کلید پنل در جدول reel.settings (کلید panel_key) است.</p>
+  </section>
+
+  <section id="t-new" class="hide">
+    <div class="card">
+      <h2>ویدیوی جدید</h2>
+      <label>سبک برند</label>
+      <select id="nKit"></select>
+      <label>ایجنت چطور کار کند؟</label>
+      <div class="modes" id="nModes">
+        <div class="mode on" data-m="auto"><b>خودکار</b><small>ایجنت خودش موضوع، هوک و سناریو را بر اساس کسب‌وکار و علایق می‌سازد.</small></div>
+        <div class="mode" data-m="topic"><b>موضوع یا ایده</b><small>شما موضوع یا ایده را می‌گویید، ایجنت بهترین ریل را برایش می‌نویسد.</small></div>
+        <div class="mode" data-m="manual"><b>سناریوی کامل</b><small>متن خودتان عیناً گفته می‌شود؛ ایجنت تصویر، صحنه و زیرنویس را می‌سازد.</small></div>
+      </div>
+      <label id="nBriefLbl">توضیح اضافه (اختیاری)</label>
+      <textarea id="nBrief" placeholder="مثلاً: این هفته تخفیف داریم، یا روی مشتری‌های جدید تمرکز کن"></textarea>
+      <label>نکته‌ی سبک برای همین ویدیو (اختیاری)</label>
+      <input id="nStyle" placeholder="مثلاً: پرانرژی، فضای شب، بیشتر نمای نزدیک محصول">
+      <div class="row">
+        <div><label>طول ویدیو: <b id="nSecV">30</b> ثانیه</label><input id="nSec" type="range" min="15" max="60" step="5" value="30"></div>
+        <div><label>&nbsp;</label><label style="display:flex;gap:8px;align-items:center;color:var(--text)"><input id="nAuto" type="checkbox"> بعد از نوشتن سناریو، ویدیو را هم بدون تأیید من بساز</label></div>
+      </div>
+      <div class="actions"><button class="btn" id="nGo">بنویس و بساز</button></div>
+      <p class="muted">پیشنهاد: اول سناریو را ببینید و تأیید کنید؛ ساخت ویدیو هزینه دارد و نوشتن سناریو تقریباً رایگان است.</p>
+    </div>
+  </section>
+
+  <section id="t-list" class="hide">
+    <div class="actions" style="margin:0 0 14px"><button class="btn ghost" id="refresh">به‌روزرسانی</button><span class="muted" id="listInfo"></span></div>
+    <div class="grid" id="plist"></div>
+  </section>
+
+  <section id="t-kit" class="hide">
+    <div class="card">
+      <div class="row">
+        <div><label>انتخاب سبک برند</label><select id="kSel"></select></div>
+        <div><label>&nbsp;</label><button class="btn ghost" id="kNew">+ سبک برند جدید</button></div>
+      </div>
+    </div>
+    <div class="card" id="kForm">
+      <h2>هویت و کسب‌وکار</h2>
+      <div class="row">
+        <div><label>نام این سبک (داخلی)</label><input data-k="name"></div>
+        <div><label>نام برند</label><input data-k="brand_name"></div>
+      </div>
+      <div class="row">
+        <div><label>آیدی اینستاگرام</label><input data-k="handle" dir="ltr" placeholder="@yourpage"></div>
+        <div><label>لوگو</label><input type="file" accept="image/*" id="kLogo"><div id="kLogoPrev" class="muted"></div></div>
+      </div>
+      <label>کسب‌وکار دقیقاً چه کار می‌کند؟</label>
+      <textarea data-k="business" placeholder="محصولات و خدمات، چیزی که شما را متفاوت می‌کند، شهر و ..."></textarea>
+      <div class="row">
+        <div><label>مخاطب هدف</label><textarea data-k="audience" placeholder="چه کسانی، چه دغدغه‌ای دارند، به چه چیزی اهمیت می‌دهند"></textarea></div>
+        <div><label>پیشنهاد / محصول اصلی برای فروش</label><textarea data-k="offer"></textarea></div>
+      </div>
+      <div class="row">
+        <div><label>علایق و موضوعات محتوا (ایجنت از این‌ها موضوع انتخاب می‌کند)</label><textarea data-k="interests" placeholder="مثلاً: نکات نگهداری، اشتباهات رایج خرید، پشت صحنه‌ی تولید، مقایسه‌ها"></textarea></div>
+        <div><label>هرگز نگو / نشان نده</label><textarea data-k="avoid" placeholder="ادعاهای پزشکی، قیمت، اسم رقبا، ..."></textarea></div>
+      </div>
+      <div class="row">
+        <div><label>لحن</label><input data-k="tone"></div>
+        <div><label>دعوت به اقدام پیش‌فرض</label><input data-k="cta_default" placeholder="مثلاً: برای مشاوره رایگان دایرکت بده"></div>
+      </div>
+
+      <h2 style="margin-top:22px">ظاهر ویدیو</h2>
+      <label>سبک تصویری (انگلیسی؛ برای مدل ساخت ویدیو)</label>
+      <input data-k="visual_style" dir="ltr">
+      <div class="row">
+        <div><label>رنگ برند (هایلایت زیرنویس و دکمه‌ها)</label><input type="color" id="kColor" value="#ffd400"></div>
+        <div><label>سبک زیرنویس</label><select id="kCap"><option value="pop">پاپ (کلمه‌ی فعال هایلایت)</option><option value="box">جعبه‌ی تیره</option><option value="clean">ساده</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>صدای گوینده</label><select data-k="voice" id="kVoice"></select></div>
+        <div><label>کیفیت ویدیو</label><select data-k="quality"><option value="standard">استاندارد (Kling 3، حدود ۲ تا ۳ دلار)</option><option value="premium">پرمیوم (Veo 3.1، ۱۰۸۰p)</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>موزیک پس‌زمینه (mp3، اختیاری)</label><input type="file" accept="audio/*" id="kMusic"><div id="kMusicPrev" class="muted"></div></div>
+        <div><label>ساخت خودکار روزانه (تعداد ویدیو در روز، ۰ = خاموش)</label><input data-k="auto_daily" type="number" min="0" max="5"></div>
+      </div>
+
+      <h2 style="margin-top:22px">عکس‌های واقعی محصول / فضا</h2>
+      <p class="muted">ایجنت این عکس‌ها را به‌عنوان فریم اول صحنه‌ها متحرک می‌کند تا ویدیو کسب‌وکار واقعی شما را نشان دهد. برای هر عکس یک توضیح کوتاه بنویسید.</p>
+      <div class="imgs" id="kImgs"></div>
+      <input type="file" accept="image/*" multiple id="kImgIn" style="margin-top:10px">
+      <div class="actions"><button class="btn" id="kSave">ذخیره‌ی سبک برند</button></div>
+    </div>
+  </section>
+
+  <section id="t-settings" class="hide">
+    <div class="card">
+      <h2>تنظیمات</h2>
+      <label>آدرس سرویس رندر (render_url)</label><input id="sRender" dir="ltr" placeholder="https://reels.example.com">
+      <div class="row">
+        <div><label>سقف هزینه‌ی هر ویدیو (دلار)</label><input id="sMax" dir="ltr"></div>
+        <div><label>شناسه‌ی چت تلگرام برای اعلان</label><input id="sTg" dir="ltr"></div>
+      </div>
+      <div class="row">
+        <div><label>مدل ویدیو استاندارد</label><input id="sStd" dir="ltr"></div>
+        <div><label>مدل ویدیو پرمیوم</label><input id="sPrem" dir="ltr"></div>
+      </div>
+      <label>مدل صدا</label><input id="sTts" dir="ltr">
+      <div class="actions"><button class="btn" id="sSave">ذخیره</button><button class="btn ghost" id="logout">خروج</button></div>
+    </div>
+  </section>
+</main>
+
+<div id="modal"><div class="box" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/webhook/reel-api';
+const VOICES = ['adam','george','sarah','alice','bella','bill','brian','callum','charlie','chris','daniel','eric','harry','jessica','laura','liam','lily','matilda','river','roger','will'];
+const STATUS = { queued:'در صف', scripting:'در حال نوشتن سناریو', script_ready:'سناریو آماده‌ی تأیید', producing:'در حال ساخت صحنه‌ها', rendering:'در حال تدوین', review:'آماده‌ی بازبینی', approved:'تأیید شد', rejected:'رد شد', failed:'خطا' };
+const BUSY = ['queued','scripting','producing','rendering'];
+const MODE_FA = { auto:'خودکار', topic:'موضوع', manual:'سناریوی کامل' };
+let KEY = '', DATA = { kits:[], projects:[], settings:{} }, MODE = 'auto', KIT = null, pollT = null;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const store = { get(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }, del(k){ try { localStorage.removeItem(k); } catch(e){} } };
+
+function toast(msg, ms = 2600){ const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', ms); }
+
+async function api(action, body = {}){
+  const r = await fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ key: KEY, action }, body)) });
+  let j; try { j = await r.json(); } catch(e) { j = { ok:false, error:'پاسخ نامعتبر از سرور (' + r.status + ')' }; }
+  if (j && j.error === 'unauthorized') { logout(); throw new Error('کلید نادرست است'); }
+  if (!j || !j.ok) throw new Error((j && j.error) || 'خطا');
+  return j;
+}
+async function busy(btn, fn){ btn.disabled = true; try { await fn(); } catch(e) { toast(e.message, 4000); } finally { btn.disabled = false; } }
+
+function logout(){ store.del('reelKey'); KEY = ''; $('#login').classList.remove('hide'); $('#tabs').classList.add('hide'); $$('main > section').forEach(s => s.id !== 'login' && s.classList.add('hide')); }
+
+async function load(){
+  DATA = await api('bootstrap');
+  $('#login').classList.add('hide'); $('#tabs').classList.remove('hide');
+  if (DATA.settings.render_url && !document.getElementById('vz')) {
+    const st = document.createElement('style'); st.id = 'vz';
+    const u = DATA.settings.render_url.replace(/\/$/, '') + '/static/fonts/vazirmatn-arabic-';
+    st.textContent = [400,700,900].map(w => "@font-face{font-family:Vazirmatn;font-weight:" + w + ";src:url('" + u + w + "-normal.woff2') format('woff2')}").join('');
+    document.head.appendChild(st);
+  }
+  renderKitsSelects(); renderList(); fillSettings();
+  if (!$('#t-new').classList.contains('hide') || $$('main > section:not(.hide)').length === 0) show('new');
+  schedulePoll();
+}
+
+function show(t){ $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); $$('main > section').forEach(s => s.classList.toggle('hide', s.id !== 't-' + t)); }
+
+// ---------- new video ----------
+function renderKitsSelects(){
+  const opts = DATA.kits.map(k => '<option value="' + k.id + '">' + esc(k.name) + '</option>').join('');
+  $('#nKit').innerHTML = opts || '<option value="">اول سبک برند بسازید</option>';
+  $('#kSel').innerHTML = opts;
+  if (!KIT && DATA.kits[0]) KIT = DATA.kits[0];
+  if (KIT) { $('#kSel').value = KIT.id; fillKit(KIT); } else fillKit({});
+}
+$$('#nModes .mode').forEach(m => m.onclick = () => {
+  MODE = m.dataset.m; $$('#nModes .mode').forEach(x => x.classList.toggle('on', x === m));
+  $('#nBriefLbl').textContent = MODE === 'auto' ? 'توضیح اضافه (اختیاری)' : MODE === 'topic' ? 'موضوع یا ایده' : 'سناریوی کامل (همان متنی که گوینده می‌گوید)';
+  $('#nBrief').placeholder = MODE === 'manual' ? 'جمله‌ی اول = هوک. متن را همان‌طور که باید گفته شود بنویسید.' : MODE === 'topic' ? 'مثلاً: ۳ اشتباه رایج موقع انتخاب ...' : 'مثلاً: این هفته روی مشتری‌های جدید تمرکز کن';
+});
+$('#nSec').oninput = e => $('#nSecV').textContent = e.target.value;
+$('#nGo').onclick = e => busy(e.target, async () => {
+  const j = await api('create_project', { kit_id: $('#nKit').value, mode: MODE, brief: $('#nBrief').value, style_notes: $('#nStyle').value, target_seconds: +$('#nSec').value, auto_produce: $('#nAuto').checked });
+  toast('ایجنت شروع به نوشتن کرد'); $('#nBrief').value = ''; $('#nStyle').value = '';
+  await load(); show('list'); openProject(j.project_id);
+});
+
+// ---------- list ----------
+function renderList(){
+  const kits = Object.fromEntries(DATA.kits.map(k => [k.id, k.name]));
+  $('#plist').innerHTML = DATA.projects.map(p => {
+    const cls = BUSY.includes(p.status) ? 'busy' : p.status;
+    return '<div class="pcard" data-id="' + p.id + '"><div class="thumb">' + (p.video_url ? '<video src="' + esc(p.video_url) + '#t=1" preload="metadata" muted></video>' : esc(STATUS[p.status] || p.status)) + '</div>' +
+      '<div class="pbody"><b>' + esc(p.title || p.hook || p.brief || ('ویدیو #' + p.id)) + '</b><span class="muted">' + esc(kits[p.kit_id] || '') + ' · ' + MODE_FA[p.mode] + '</span><br><span class="badge ' + cls + '">' + esc(STATUS[p.status] || p.status) + '</span></div></div>';
+  }).join('') || '<p class="muted">هنوز ویدیویی ساخته نشده.</p>';
+  $$('#plist .pcard').forEach(c => c.onclick = () => openProject(+c.dataset.id));
+  const n = DATA.projects.filter(p => BUSY.includes(p.status)).length;
+  $('#listInfo').textContent = n ? n + ' ویدیو در حال پردازش؛ صفحه خودش به‌روز می‌شود.' : '';
+}
+function schedulePoll(){
+  clearTimeout(pollT);
+  if (DATA.projects.some(p => BUSY.includes(p.status))) pollT = setTimeout(async () => { try { DATA = await api('bootstrap'); renderList(); if (OPEN && $('#modal').style.display === 'block') refreshOpen(); } catch(e) {} schedulePoll(); }, 8000);
+}
+$('#refresh').onclick = e => busy(e.target, load);
+
+// ---------- project detail ----------
+let OPEN = null;
+async function openProject(id){ const j = await api('get_project', { project_id: id }); OPEN = j.project; renderProject(); $('#modal').style.display = 'block'; }
+async function refreshOpen(){ const p = DATA.projects.find(x => x.id === OPEN.id); if (p && p.status !== OPEN.status) { const j = await api('get_project', { project_id: OPEN.id }); OPEN = j.project; renderProject(); } }
+$('#modal').onclick = e => { if (e.target.id === 'modal') { $('#modal').style.display = 'none'; OPEN = null; } };
+
+function renderProject(){
+  const p = OPEN, sb = p.storyboard || null, qa = p.qa || {}, kit = DATA.kits.find(k => k.id === p.kit_id) || {};
+  const imgs = Array.isArray(kit.images) ? kit.images : [];
+  const isBusy = BUSY.includes(p.status);
+  let h = '<div class="actions" style="margin:0 0 10px;justify-content:space-between"><h2 style="margin:0">' + esc(p.title || ('ویدیو #' + p.id)) + '</h2><button class="btn ghost" id="mClose">بستن</button></div>';
+  h += '<span class="badge ' + (isBusy ? 'busy' : p.status) + '">' + esc(STATUS[p.status] || p.status) + '</span> <span class="muted">' + MODE_FA[p.mode] + ' · ' + p.target_seconds + ' ثانیه' + (+p.cost_usd ? ' · هزینه‌ی ویدیو $' + (+p.cost_usd).toFixed(2) : '') + '</span>';
+  if (p.error) h += '<p class="muted" style="color:var(--bad)">' + esc(p.error) + '</p>';
+  if (isBusy) h += '<p class="muted">ایجنت در حال کار است… (ساخت کامل ویدیو معمولاً ۵ تا ۱۵ دقیقه طول می‌کشد)</p>';
+  if (p.video_url) h += '<div class="vid" style="margin-top:12px"><video src="' + esc(p.video_url) + '" controls playsinline></video><div style="flex:1;min-width:220px"><h3>کپشن</h3><textarea id="mCapRead" style="min-height:160px">' + esc((p.caption || '') + '\n\n' + (p.hashtags || '')) + '</textarea><div class="actions"><button class="btn ghost" id="mCopy">کپی کپشن</button><a class="btn ghost" href="' + esc(p.video_url) + '" download target="_blank">دانلود ویدیو</a></div></div></div>';
+  if (sb) {
+    if (qa && (qa.hook_score || qa.notes)) h += '<h3>ارزیابی ایجنت</h3><div class="scores"><span>هوک ' + (qa.hook_score || '-') + '/۱۰</span><span>وضوح ' + (qa.clarity_score || '-') + '/۱۰</span><span>ارزش ' + (qa.value_score || '-') + '/۱۰</span><span>تعامل ' + (qa.engagement_score || '-') + '/۱۰</span>' + (sb.stats ? '<span>' + sb.stats.words + ' کلمه ≈ ' + sb.stats.est_seconds + ' ثانیه</span>' : '') + '</div>' + (qa.notes ? '<p class="muted">' + esc(qa.notes) + '</p>' : '');
+    h += '<h3>هوک</h3><div class="row"><input id="eHook" value="' + esc(sb.hook && sb.hook.text) + '"><input id="eHi" placeholder="کلمه‌ی هایلایت" value="' + esc(sb.hook && sb.hook.highlight) + '"></div>';
+    h += '<h3>صحنه‌ها</h3>' + (sb.scenes || []).map((s, i) => '<div class="scene" data-i="' + i + '"><span class="n">صحنه ' + (i + 1) + '</span>' +
+      '<label>متن گوینده</label><textarea class="eVo" style="min-height:60px">' + esc(s.voiceover) + '</textarea>' +
+      '<div class="row"><div><label>برچسب روی تصویر</label><input class="eLb" value="' + esc(s.label) + '"></div><div><label>عکس برند</label><select class="eImg"><option value="-1">تصویر ساخته‌شده با هوش مصنوعی</option>' + imgs.map((im, j) => '<option value="' + j + '"' + (s.use_image === j ? ' selected' : '') + '>' + esc(im.desc || ('عکس ' + (j + 1))) + '</option>').join('') + '</select></div></div>' +
+      '<details><summary class="muted">پرامپت تصویر</summary><textarea class="eVp" dir="ltr" style="min-height:60px">' + esc(s.visual_prompt) + '</textarea></details></div>').join('');
+    h += '<h3>دعوت به اقدام</h3><div class="row"><input id="eCt" value="' + esc(sb.cta && sb.cta.text) + '" placeholder="متن روی تصویر"><input id="eCs" value="' + esc(sb.cta && sb.cta.sub) + '" placeholder="خط دوم"></div><label>متن گوینده</label><input id="eCv" value="' + esc(sb.cta && sb.cta.voiceover) + '">';
+    h += '<h3>کپشن</h3><textarea id="eCap">' + esc(p.caption || sb.caption || '') + '</textarea>';
+    if (!isBusy) h += '<div class="actions"><button class="btn ghost" id="mSave">ذخیره‌ی تغییرات سناریو</button><button class="btn" id="mProduce">' + (p.video_url ? 'ساخت دوباره‌ی ویدیو' : 'تأیید سناریو و ساخت ویدیو') + '</button></div>';
+  }
+  if (!isBusy) {
+    h += '<h3>بازخورد به ایجنت</h3><textarea id="mFb" placeholder="مثلاً: هوک ضعیف بود، لحن رسمی‌تر، روی قیمت تأکید نکن…">' + esc(p.feedback || '') + '</textarea><div class="actions"><button class="btn ghost" id="mRegen">سناریوی جدید با این بازخورد</button>';
+    if (['review','approved','rejected'].includes(p.status)) h += '<button class="btn ok" id="mOk">تأیید ویدیو</button><button class="btn bad" id="mNo">رد ویدیو</button>';
+    h += '<button class="x" id="mDel">حذف</button></div>';
+  }
+  $('#mbox').innerHTML = h;
+  $('#mClose').onclick = () => { $('#modal').style.display = 'none'; OPEN = null; };
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = e => busy(e.target, fn); };
+  on('mCopy', async () => { await navigator.clipboard.writeText($('#mCapRead').value); toast('کپی شد'); });
+  on('mSave', async () => { await saveScript(); toast('ذخیره شد'); });
+  on('mProduce', async () => { await saveScript(); await api('produce', { project_id: p.id }); toast('ساخت ویدیو شروع شد'); await reopen(); });
+  on('mRegen', async () => { await api('regenerate', { project_id: p.id, feedback: $('#mFb').value }); toast('ایجنت سناریوی جدید می‌نویسد'); await reopen(); });
+  on('mOk', async () => { await api('review', { project_id: p.id, decision: 'approve', feedback: $('#mFb').value }); toast('تأیید شد'); await reopen(); });
+  on('mNo', async () => { await api('review', { project_id: p.id, decision: 'reject', feedback: $('#mFb').value }); toast('رد شد؛ بازخورد برای ویدیوهای بعدی استفاده می‌شود'); await reopen(); });
+  on('mDel', async () => { if (!confirm('حذف شود؟')) return; await api('delete_project', { project_id: p.id }); $('#modal').style.display = 'none'; OPEN = null; await load(); });
+}
+async function reopen(){ await load(); await openProject(OPEN.id); }
+async function saveScript(){
+  const sb = JSON.parse(JSON.stringify(OPEN.storyboard));
+  sb.hook = Object.assign({}, sb.hook, { text: $('#eHook').value.trim(), highlight: $('#eHi').value.trim() });
+  sb.scenes = $$('#mbox .scene').map((el, i) => Object.assign({}, sb.scenes[i], { voiceover: $('.eVo', el).value.trim(), label: $('.eLb', el).value.trim(), visual_prompt: $('.eVp', el).value.trim(), use_image: +$('.eImg', el).value }));
+  sb.cta = { text: $('#eCt').value.trim(), sub: $('#eCs').value.trim(), voiceover: $('#eCv').value.trim() };
+  const norm = s => s.replace(/[\s‌.,!?؟،:؛«»"']/g, '');
+  if (sb.hook.text && !norm(sb.scenes[0].voiceover).startsWith(norm(sb.hook.text))) sb.scenes[0].voiceover = sb.hook.text + ' ' + sb.scenes[0].voiceover;
+  await api('update_script', { project_id: OPEN.id, storyboard: sb, caption: $('#eCap').value });
+  OPEN.storyboard = sb;
+}
+
+// ---------- style kit ----------
+let KIMGS = [];
+$('#kVoice').innerHTML = VOICES.map(v => '<option>' + v + '</option>').join('');
+$('#kSel').onchange = () => { KIT = DATA.kits.find(k => k.id === +$('#kSel').value); fillKit(KIT); };
+$('#kNew').onclick = () => { KIT = null; fillKit({}); toast('فرم سبک جدید باز شد'); };
+function fillKit(k){
+  $$('#kForm [data-k]').forEach(el => { const v = k[el.dataset.k]; el.value = v == null ? (el.dataset.k === 'auto_daily' ? 0 : el.dataset.k === 'voice' ? 'adam' : el.dataset.k === 'quality' ? 'standard' : '') : v; });
+  const th = k.theme || {}; $('#kColor').value = th.primary || '#ffd400'; $('#kCap').value = th.captionStyle || 'pop';
+  $('#kLogo').dataset.url = k.logo_url || ''; $('#kLogoPrev').innerHTML = k.logo_url ? '<img src="' + esc(k.logo_url) + '" style="height:48px;margin-top:6px;border-radius:8px">' : '';
+  $('#kMusic').dataset.url = k.music_url || ''; $('#kMusicPrev').innerHTML = k.music_url ? '<audio controls src="' + esc(k.music_url) + '" style="width:100%;margin-top:6px"></audio>' : '';
+  KIMGS = Array.isArray(k.images) ? k.images.slice() : []; renderImgs();
+}
+function renderImgs(){
+  $('#kImgs').innerHTML = KIMGS.map((im, i) => '<div class="img"><img src="' + esc(im.url) + '"><input data-i="' + i + '" value="' + esc(im.desc || '') + '" placeholder="توضیح عکس"><button class="x" data-del="' + i + '">حذف</button></div>').join('');
+  $$('#kImgs input').forEach(el => el.oninput = () => KIMGS[+el.dataset.i].desc = el.value);
+  $$('#kImgs [data-del]').forEach(el => el.onclick = () => { KIMGS.splice(+el.dataset.del, 1); renderImgs(); });
+}
+function fileToB64(file, maxSide){
+  return new Promise((res, rej) => {
+    if (!maxSide) { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(file); return; }
+    const img = new Image(); img.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(img.width, img.height)); const c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      res(c.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.9)); URL.revokeObjectURL(img.src);
+    }; img.onerror = rej; img.src = URL.createObjectURL(file);
+  });
+}
+async function upload(file, maxSide){
+  const data = await fileToB64(file, maxSide);
+  const ext = maxSide ? (data.startsWith('data:image/png') ? 'png' : 'jpg') : (file.name.split('.').pop() || 'mp3').toLowerCase();
+  const j = await api('upload', { data, ext }); return j.url;
+}
+$('#kLogo').onchange = async e => { if (!e.target.files[0]) return; toast('در حال آپلود…'); try { const u = await upload(e.target.files[0], 800); e.target.dataset.url = u; $('#kLogoPrev').innerHTML = '<img src="' + esc(u) + '" style="height:48px;margin-top:6px;border-radius:8px">'; toast('لوگو آپلود شد'); } catch(err) { toast(err.message, 4000); } };
+$('#kMusic').onchange = async e => { const f = e.target.files[0]; if (!f) return; if (f.size > 9e6) return toast('حداکثر ۹ مگابایت'); toast('در حال آپلود…'); try { const u = await upload(f, 0); e.target.dataset.url = u; $('#kMusicPrev').innerHTML = '<audio controls src="' + esc(u) + '" style="width:100%;margin-top:6px"></audio>'; toast('موزیک آپلود شد'); } catch(err) { toast(err.message, 4000); } };
+$('#kImgIn').onchange = async e => { const files = Array.from(e.target.files); toast('در حال آپلود ' + files.length + ' عکس…', 8000); for (const f of files) { try { KIMGS.push({ url: await upload(f, 1600), desc: '' }); renderImgs(); } catch(err) { toast(err.message, 4000); } } e.target.value = ''; toast('آپلود شد؛ برای هر عکس توضیح بنویسید و ذخیره کنید'); };
+$('#kSave').onclick = e => busy(e.target, async () => {
+  const kit = { id: KIT ? KIT.id : null, theme: { primary: $('#kColor').value, captionStyle: $('#kCap').value }, logo_url: $('#kLogo').dataset.url || '', music_url: $('#kMusic').dataset.url || '', images: KIMGS };
+  $$('#kForm [data-k]').forEach(el => kit[el.dataset.k] = el.value);
+  const j = await api('save_kit', { kit }); KIT = j.kit; toast('ذخیره شد'); await load();
+});
+
+// ---------- settings ----------
+function fillSettings(){ const s = DATA.settings || {}; $('#sRender').value = s.render_url || ''; $('#sMax').value = s.max_cost_per_video_usd || ''; $('#sTg').value = s.telegram_chat_id || ''; $('#sStd').value = s.video_model_standard || ''; $('#sPrem').value = s.video_model_premium || ''; $('#sTts').value = s.tts_model || ''; }
+$('#sSave').onclick = e => busy(e.target, async () => {
+  await api('save_settings', { settings: { render_url: $('#sRender').value, max_cost_per_video_usd: $('#sMax').value, telegram_chat_id: $('#sTg').value, video_model_standard: $('#sStd').value, video_model_premium: $('#sPrem').value, tts_model: $('#sTts').value } });
+  toast('ذخیره شد'); await load();
+});
+$('#logout').onclick = logout;
+
+$$('#tabs button').forEach(b => b.onclick = () => show(b.dataset.t));
+$('#loginBtn').onclick = e => busy(e.target, async () => { KEY = $('#keyIn').value.trim(); await load(); store.set('reelKey', KEY); show('new'); });
+KEY = store.get('reelKey'); if (KEY) load().then(() => show('new')).catch(() => {});
+</script>
+</body>
+</html>

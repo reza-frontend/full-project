@@ -26,6 +26,8 @@ fs.mkdirSync(OUT, { recursive: true });
 const app = express();
 app.use('/files', express.static(ASSETS, { maxAge: '7d' }));
 app.use('/renders', express.static(OUT, { maxAge: '7d' }));
+// Persian font for the n8n panel page.
+app.use('/static/fonts', express.static(path.join(__dirname, 'node_modules', '@fontsource', 'vazirmatn', 'files'), { maxAge: '30d' }));
 app.get('/health', (req, res) => res.json({ ok: true, bundled: !!serveUrl, queue: queue.length, rendering: current }));
 
 app.use('/api', (req, res, next) => {
@@ -57,29 +59,74 @@ const saveAsset = async (buf, contentType, extHint) => {
 
 // Downloads (or POSTs to) any URL and stores the response as an asset.
 // auth: "openrouter" adds the OpenRouter key server-side (video downloads, text-to-speech).
-app.post('/api/assets/fetch', express.json({ limit: '2mb' }), async (req, res) => {
-  const { url, method = 'GET', headers = {}, body, auth, ext } = req.body || {};
-  if (!url) return res.status(400).json({ error: 'url required' });
-  try {
-    const h = { ...headers };
-    if (auth === 'openrouter') {
-      if (!/^https:\/\/openrouter\.ai\//.test(url)) return res.status(400).json({ error: 'openrouter auth only for openrouter.ai urls' });
-      h.Authorization = `Bearer ${OPENROUTER_API_KEY}`;
-    }
-    if (body !== undefined) h['Content-Type'] = h['Content-Type'] || 'application/json';
-    const r = await fetch(url, { method, headers: h, body: body === undefined ? undefined : (typeof body === 'string' ? body : JSON.stringify(body)) });
-    const buf = Buffer.from(await r.arrayBuffer());
-    if (!r.ok) return res.status(502).json({ error: `upstream ${r.status}`, detail: buf.toString('utf8').slice(0, 800) });
-    res.json(await saveAsset(buf, r.headers.get('content-type'), ext));
-  } catch (e) {
-    res.status(502).json({ error: String(e.message || e) });
+const fetchToAsset = async ({ url, method = 'GET', headers = {}, body, auth, ext }) => {
+  if (!url) throw Object.assign(new Error('url required'), { status: 400 });
+  const h = { ...headers };
+  if (auth === 'openrouter') {
+    if (!/^https:\/\/openrouter\.ai\//.test(url)) throw Object.assign(new Error('openrouter auth only for openrouter.ai urls'), { status: 400 });
+    h.Authorization = `Bearer ${OPENROUTER_API_KEY}`;
   }
+  if (body !== undefined) h['Content-Type'] = h['Content-Type'] || 'application/json';
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(url, { method, headers: h, body: body === undefined ? undefined : (typeof body === 'string' ? body : JSON.stringify(body)), signal: AbortSignal.timeout(180000) });
+      const buf = Buffer.from(await r.arrayBuffer());
+      if (r.ok) return await saveAsset(buf, r.headers.get('content-type'), ext);
+      lastErr = Object.assign(new Error(`upstream ${r.status}: ${buf.toString('utf8').slice(0, 600)}`), { status: 502 });
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = Object.assign(new Error(String(e.message || e)), { status: 502 });
+    }
+    await new Promise((res) => setTimeout(res, attempt * 3000));
+  }
+  throw lastErr;
+};
+
+app.post('/api/assets/fetch', express.json({ limit: '2mb' }), async (req, res) => {
+  try {
+    res.json(await fetchToAsset(req.body || {}));
+  } catch (e) {
+    res.status(e.status || 502).json({ error: String(e.message || e) });
+  }
+});
+
+// Batch version: { items: [{ key, url, method, body, auth, ext }] } -> { results: [{ key, ok, asset | error }] }.
+// Runs up to 4 downloads at a time; one failure never fails the whole batch. "meta" is echoed back unchanged.
+app.post('/api/assets/fetch-many', express.json({ limit: '5mb' }), async (req, res) => {
+  const items = Array.isArray((req.body || {}).items) ? req.body.items : [];
+  const results = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      const it = items[i] || {};
+      try {
+        results[i] = { key: it.key ?? i, ok: true, asset: await fetchToAsset(it) };
+      } catch (e) {
+        results[i] = { key: it.key ?? i, ok: false, error: String(e.message || e).slice(0, 800) };
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(4, items.length) }, worker));
+  res.json({ results, meta: (req.body || {}).meta ?? null });
 });
 
 // Raw upload (body = file bytes). ?ext=png
 app.post('/api/assets/upload', express.raw({ type: () => true, limit: '300mb' }), async (req, res) => {
   if (!req.body || !req.body.length) return res.status(400).json({ error: 'empty body' });
   res.json(await saveAsset(req.body, req.get('content-type'), req.query.ext));
+});
+
+// Base64 upload from the n8n panel (images are downscaled in the browser first). { data, ext }
+app.post('/api/assets/upload-b64', express.json({ limit: '40mb' }), async (req, res) => {
+  const { data, ext } = req.body || {};
+  const b64 = String(data || '').replace(/^data:[^;]+;base64,/, '');
+  if (!b64) return res.status(400).json({ error: 'data required' });
+  const allowed = ['png', 'jpg', 'jpeg', 'webp', 'mp3', 'm4a', 'wav', 'mp4', 'mov'];
+  const e = String(ext || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!allowed.includes(e)) return res.status(400).json({ error: `ext must be one of ${allowed.join(', ')}` });
+  res.json(await saveAsset(Buffer.from(b64, 'base64'), null, e));
 });
 
 app.post('/api/assets/probe', express.json(), async (req, res) => {
