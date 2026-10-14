@@ -36,9 +36,18 @@ docker compose up -d --build
 curl http://localhost:3900/health
 ```
 
-یک زیردامنه (مثلاً `reels.sairox.ir`) را از طریق reverse proxy به پورت 3900 وصل کنید. آدرس باید از اینترنت باز شود، چون OpenRouter عکس‌های برند را از همین آدرس می‌خواند و پنل ویدیوها را از آن پخش می‌کند.
+روی سرور سایروکس، سرویس رندر پشت همان Caddy که n8n را سرو می‌کند و زیر مسیر `https://panel.sairox.ir/reels` قرار گرفته است:
 
-بعد در پنل، بخش «تنظیمات»، همین آدرس را در «آدرس سرویس رندر» بگذارید.
+- `docker-compose.override.yml` کانتینر را به شبکه‌ی `sairox_default` وصل می‌کند.
+- در `/opt/sairox/Caddyfile`، داخل بلوک `{$PANEL_DOMAIN}`:
+  ```
+  handle_path /reels/* {
+      reverse_proxy reel-render:3900
+  }
+  ```
+- در `.env`: `REEL_PUBLIC_URL=https://panel.sairox.ir/reels`
+
+در تنظیمات پنل، «آدرس سرویس رندر» = `https://panel.sairox.ir/reels`.
 
 ## استفاده
 
