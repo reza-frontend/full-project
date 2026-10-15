@@ -83,25 +83,38 @@ input[type=checkbox]{width:auto}
 
   <section id="t-new" class="hide">
     <div class="card">
-      <h2>ویدیوی جدید</h2>
+      <h2>تدوین فیلم خودم</h2>
+      <p class="muted">فیلم عمودی گوشی (یک یا چند کلیپ، تا ۳ دقیقه خروجی). ایجنت مکث‌ها، تکرارها و «اِ… اُم…» را حذف می‌کند، زیرنویس دقیق کلمه‌به‌کلمه، کارت هوک، موشن‌گرافی، لوگو، موزیک و دعوت به اقدام اضافه می‌کند.</p>
+      <label>سبک برند</label>
+      <select id="eKit"></select>
+      <label>فایل‌های ویدیو (به ترتیب پخش)</label>
+      <input id="eFiles" type="file" accept="video/*" multiple>
+      <div id="eList" class="muted"></div>
+      <div class="row">
+        <div><label>طول تقریبی خروجی: <b id="eSecV">60</b> ثانیه</label><input id="eSec" type="range" min="15" max="180" step="5" value="60"></div>
+        <div><label>نکته برای تدوین (اختیاری)</label><input id="eStyle" placeholder="مثلاً: پرانرژی، جمله‌ی قیمت را حذف کن"></div>
+      </div>
+      <label>موضوع یا متنی که گفته‌ای (اختیاری؛ به ایجنت کمک می‌کند بهترین قسمت‌ها را نگه دارد)</label>
+      <textarea id="eBrief" placeholder="مثلاً: سه اشتباه رایج در دم کردن قهوه"></textarea>
+      <div class="actions"><button class="btn" id="eGo">آپلود و تدوین</button></div>
+      <p class="muted">بعد از آپلود می‌توانید صفحه را ببندید؛ ویدیوی آماده در بخش «ویدیوها» نمایش داده می‌شود.</p>
+    </div>
+    <div class="card">
+      <h2>سناریو برای فیلم‌برداری</h2>
+      <p class="muted">قبل از فیلم گرفتن، ایجنت هوک و متن صحبت و اینکه هر جمله را با چه تصویری بگیرید، می‌نویسد.</p>
       <label>سبک برند</label>
       <select id="nKit"></select>
-      <label>ایجنت چطور کار کند؟</label>
-      <div class="modes" id="nModes">
-        <div class="mode on" data-m="auto"><b>خودکار</b><small>ایجنت خودش موضوع، هوک و سناریو را بر اساس کسب‌وکار و علایق می‌سازد.</small></div>
-        <div class="mode" data-m="topic"><b>موضوع یا ایده</b><small>شما موضوع یا ایده را می‌گویید، ایجنت بهترین ریل را برایش می‌نویسد.</small></div>
-        <div class="mode" data-m="manual"><b>سناریوی کامل</b><small>متن خودتان عیناً گفته می‌شود؛ ایجنت تصویر، صحنه و زیرنویس را می‌سازد.</small></div>
+      <div class="modes" id="nModes" style="grid-template-columns:repeat(2,1fr)">
+        <div class="mode on" data-m="auto"><b>خودکار</b><small>ایجنت خودش موضوع و هوک را از روی کسب‌وکار و علایق انتخاب می‌کند.</small></div>
+        <div class="mode" data-m="topic"><b>موضوع یا ایده</b><small>شما موضوع را می‌گویید، ایجنت بهترین سناریو را می‌نویسد.</small></div>
       </div>
       <label id="nBriefLbl">توضیح اضافه (اختیاری)</label>
       <textarea id="nBrief" placeholder="مثلاً: این هفته تخفیف داریم، یا روی مشتری‌های جدید تمرکز کن"></textarea>
-      <label>نکته‌ی سبک برای همین ویدیو (اختیاری)</label>
-      <input id="nStyle" placeholder="مثلاً: پرانرژی، فضای شب، بیشتر نمای نزدیک محصول">
       <div class="row">
         <div><label>طول ویدیو: <b id="nSecV">30</b> ثانیه</label><input id="nSec" type="range" min="15" max="60" step="5" value="30"></div>
-        <div><label>&nbsp;</label><label style="display:flex;gap:8px;align-items:center;color:var(--text)"><input id="nAuto" type="checkbox"> بعد از نوشتن سناریو، ویدیو را هم بدون تأیید من بساز</label></div>
+        <div><label>نکته‌ی سبک (اختیاری)</label><input id="nStyle" placeholder="مثلاً: طنز، رسمی، پرانرژی"></div>
       </div>
-      <div class="actions"><button class="btn" id="nGo">بنویس و بساز</button></div>
-      <p class="muted">پیشنهاد: اول سناریو را ببینید و تأیید کنید؛ ساخت ویدیو هزینه دارد و نوشتن سناریو تقریباً رایگان است.</p>
+      <div class="actions"><button class="btn ghost" id="nGo">بنویس</button></div>
     </div>
   </section>
 
@@ -143,23 +156,17 @@ input[type=checkbox]{width:auto}
       </div>
 
       <h2 style="margin-top:22px">ظاهر ویدیو</h2>
-      <label>سبک تصویری (انگلیسی؛ برای مدل ساخت ویدیو)</label>
-      <input data-k="visual_style" dir="ltr">
       <div class="row">
         <div><label>رنگ برند (هایلایت زیرنویس و دکمه‌ها)</label><input type="color" id="kColor" value="#ffd400"></div>
         <div><label>سبک زیرنویس</label><select id="kCap"><option value="pop">پاپ (کلمه‌ی فعال هایلایت)</option><option value="box">جعبه‌ی تیره</option><option value="clean">ساده</option></select></div>
       </div>
       <div class="row">
-        <div><label>صدای گوینده</label><select data-k="voice" id="kVoice"></select></div>
-        <div><label>کیفیت ویدیو</label><select data-k="quality"><option value="standard">استاندارد (Kling 3، حدود ۲ تا ۳ دلار)</option><option value="premium">پرمیوم (Veo 3.1، ۱۰۸۰p)</option></select></div>
-      </div>
-      <div class="row">
-        <div><label>موزیک پس‌زمینه (mp3، اختیاری)</label><input type="file" accept="audio/*" id="kMusic"><div id="kMusicPrev" class="muted"></div></div>
-        <div><label>ساخت خودکار روزانه (تعداد ویدیو در روز، ۰ = خاموش)</label><input data-k="auto_daily" type="number" min="0" max="5"></div>
+        <div><label>قاب دور ویدیو</label><select id="kFrame"><option value="none">بدون قاب</option><option value="solid">قاب رنگی</option><option value="glow">قاب رنگی درخشان</option></select></div>
+        <div><label>موزیک پس‌زمینه (mp3، اختیاری؛ صدایش زیر صحبت شما کم است)</label><input type="file" accept="audio/*" id="kMusic"><div id="kMusicPrev" class="muted"></div></div>
       </div>
 
       <h2 style="margin-top:22px">عکس‌های واقعی محصول / فضا</h2>
-      <p class="muted">ایجنت این عکس‌ها را به‌عنوان فریم اول صحنه‌ها متحرک می‌کند تا ویدیو کسب‌وکار واقعی شما را نشان دهد. برای هر عکس یک توضیح کوتاه بنویسید.</p>
+      <p class="muted">وقتی درباره‌ی محصولی صحبت می‌کنید، ایجنت عکس آن را به‌صورت کارت متحرک روی ویدیو نشان می‌دهد. برای هر عکس یک توضیح کوتاه بنویسید (مثلاً اسم محصول).</p>
       <div class="imgs" id="kImgs"></div>
       <input type="file" accept="image/*" multiple id="kImgIn" style="margin-top:10px">
       <div class="actions"><button class="btn" id="kSave">ذخیره‌ی سبک برند</button></div>
@@ -171,14 +178,10 @@ input[type=checkbox]{width:auto}
       <h2>تنظیمات</h2>
       <label>آدرس سرویس رندر (render_url)</label><input id="sRender" dir="ltr" placeholder="https://reels.example.com">
       <div class="row">
-        <div><label>سقف هزینه‌ی هر ویدیو (دلار)</label><input id="sMax" dir="ltr"></div>
-        <div><label>شناسه‌ی چت تلگرام برای اعلان</label><input id="sTg" dir="ltr"></div>
+        <div><label>مدل تبدیل گفتار به متن</label><input id="sStt" dir="ltr"></div>
+        <div><label>مدل تدوینگر</label><input id="sEd" dir="ltr"></div>
       </div>
-      <div class="row">
-        <div><label>مدل ویدیو استاندارد</label><input id="sStd" dir="ltr"></div>
-        <div><label>مدل ویدیو پرمیوم</label><input id="sPrem" dir="ltr"></div>
-      </div>
-      <label>مدل صدا</label><input id="sTts" dir="ltr">
+      <label>شناسه‌ی چت تلگرام برای اعلان</label><input id="sTg" dir="ltr">
       <div class="actions"><button class="btn" id="sSave">ذخیره</button><button class="btn ghost" id="logout">خروج</button></div>
     </div>
   </section>
@@ -190,9 +193,9 @@ input[type=checkbox]{width:auto}
 <script>
 const API = '/webhook/reel-api';
 const VOICES = ['adam','george','sarah','alice','bella','bill','brian','callum','charlie','chris','daniel','eric','harry','jessica','laura','liam','lily','matilda','river','roger','will'];
-const STATUS = { queued:'در صف', scripting:'در حال نوشتن سناریو', script_ready:'سناریو آماده‌ی تأیید', producing:'در حال ساخت صحنه‌ها', rendering:'در حال تدوین', review:'آماده‌ی بازبینی', approved:'تأیید شد', rejected:'رد شد', failed:'خطا' };
-const BUSY = ['queued','scripting','producing','rendering'];
-const MODE_FA = { auto:'خودکار', topic:'موضوع', manual:'سناریوی کامل' };
+const STATUS = { queued:'در صف', scripting:'در حال نوشتن سناریو', script_ready:'سناریو آماده', producing:'در حال ساخت', editing:'در حال تحلیل فیلم و برش', rendering:'در حال رندر', review:'آماده‌ی بازبینی', approved:'تأیید شد', rejected:'رد شد', failed:'خطا' };
+const BUSY = ['queued','scripting','producing','editing','rendering'];
+const MODE_FA = { auto:'سناریو', topic:'سناریو', manual:'سناریو', edit:'تدوین فیلم' };
 let KEY = '', DATA = { kits:[], projects:[], settings:{} }, MODE = 'auto', KIT = null, pollT = null;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -232,19 +235,50 @@ function show(t){ $$('#tabs button').forEach(b => b.classList.toggle('on', b.dat
 function renderKitsSelects(){
   const opts = DATA.kits.map(k => '<option value="' + k.id + '">' + esc(k.name) + '</option>').join('');
   $('#nKit').innerHTML = opts || '<option value="">اول سبک برند بسازید</option>';
+  $('#eKit').innerHTML = $('#nKit').innerHTML;
   $('#kSel').innerHTML = opts;
   if (!KIT && DATA.kits[0]) KIT = DATA.kits[0];
   if (KIT) { $('#kSel').value = KIT.id; fillKit(KIT); } else fillKit({});
 }
 $$('#nModes .mode').forEach(m => m.onclick = () => {
   MODE = m.dataset.m; $$('#nModes .mode').forEach(x => x.classList.toggle('on', x === m));
-  $('#nBriefLbl').textContent = MODE === 'auto' ? 'توضیح اضافه (اختیاری)' : MODE === 'topic' ? 'موضوع یا ایده' : 'سناریوی کامل (همان متنی که گوینده می‌گوید)';
-  $('#nBrief').placeholder = MODE === 'manual' ? 'جمله‌ی اول = هوک. متن را همان‌طور که باید گفته شود بنویسید.' : MODE === 'topic' ? 'مثلاً: ۳ اشتباه رایج موقع انتخاب ...' : 'مثلاً: این هفته روی مشتری‌های جدید تمرکز کن';
+  $('#nBriefLbl').textContent = MODE === 'auto' ? 'توضیح اضافه (اختیاری)' : 'موضوع یا ایده';
+  $('#nBrief').placeholder = MODE === 'topic' ? 'مثلاً: ۳ اشتباه رایج موقع انتخاب ...' : 'مثلاً: این هفته روی مشتری‌های جدید تمرکز کن';
 });
 $('#nSec').oninput = e => $('#nSecV').textContent = e.target.value;
 $('#nGo').onclick = e => busy(e.target, async () => {
-  const j = await api('create_project', { kit_id: $('#nKit').value, mode: MODE, brief: $('#nBrief').value, style_notes: $('#nStyle').value, target_seconds: +$('#nSec').value, auto_produce: $('#nAuto').checked });
+  const j = await api('create_project', { kit_id: $('#nKit').value, mode: MODE, brief: $('#nBrief').value, style_notes: $('#nStyle').value, target_seconds: +$('#nSec').value });
   toast('ایجنت شروع به نوشتن کرد'); $('#nBrief').value = ''; $('#nStyle').value = '';
+  await load(); show('list'); openProject(j.project_id);
+});
+
+// ---------- edit my footage ----------
+let EFILES = [];
+$('#eSec').oninput = e => $('#eSecV').textContent = e.target.value;
+$('#eFiles').onchange = e => { EFILES = Array.from(e.target.files); renderEList(); };
+function renderEList(prog){ $('#eList').innerHTML = EFILES.map((f, i) => '<div>' + (i + 1) + '. ' + esc(f.name) + ' — ' + (f.size / 1048576).toFixed(0) + ' MB' + (prog && prog[i] != null ? ' — <b>' + Math.round(prog[i] * 100) + '٪</b>' : '') + '</div>').join(''); }
+function uploadVideo(file, t, onProgress){
+  return new Promise((res, rej) => {
+    const ext = (file.name.split('.').pop() || 'mp4').toLowerCase();
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', t.upload_url + '?exp=' + t.exp + '&token=' + t.token + '&ext=' + encodeURIComponent(ext));
+    xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
+    xhr.onload = () => { let j = {}; try { j = JSON.parse(xhr.responseText); } catch(e) {} if (xhr.status < 300 && j.id) res(j); else rej(new Error(j.error || ('آپلود ناموفق (' + xhr.status + ')'))); };
+    xhr.onerror = () => rej(new Error('خطای شبکه در آپلود'));
+    xhr.send(file);
+  });
+}
+$('#eGo').onclick = e => busy(e.target, async () => {
+  if (!EFILES.length) throw new Error('اول فایل ویدیو را انتخاب کنید');
+  if (EFILES.some(f => f.size > 1.5e9)) throw new Error('هر فایل حداکثر ۱٫۵ گیگابایت');
+  const t = await api('upload_ticket');
+  const prog = EFILES.map(() => 0); const clips = [];
+  for (let i = 0; i < EFILES.length; i++) {
+    const up = await uploadVideo(EFILES[i], t, p => { prog[i] = p; renderEList(prog); });
+    clips.push({ id: up.id, url: up.url, name: EFILES[i].name, duration: up.duration });
+  }
+  const j = await api('create_project', { kit_id: $('#eKit').value, mode: 'edit', clips, brief: $('#eBrief').value, style_notes: $('#eStyle').value, target_seconds: +$('#eSec').value });
+  toast('آپلود شد؛ ایجنت تدوین را شروع کرد'); EFILES = []; $('#eFiles').value = ''; $('#eList').innerHTML = ''; $('#eBrief').value = ''; $('#eStyle').value = '';
   await load(); show('list'); openProject(j.project_id);
 });
 
@@ -279,21 +313,22 @@ function renderProject(){
   let h = '<div class="actions" style="margin:0 0 10px;justify-content:space-between"><h2 style="margin:0">' + esc(p.title || ('ویدیو #' + p.id)) + '</h2><button class="btn ghost" id="mClose">بستن</button></div>';
   h += '<span class="badge ' + (isBusy ? 'busy' : p.status) + '">' + esc(STATUS[p.status] || p.status) + '</span> <span class="muted">' + MODE_FA[p.mode] + ' · ' + p.target_seconds + ' ثانیه' + (+p.cost_usd ? ' · هزینه‌ی ویدیو $' + (+p.cost_usd).toFixed(2) : '') + '</span>';
   if (p.error) h += '<p class="muted" style="color:var(--bad)">' + esc(p.error) + '</p>';
-  if (isBusy) h += '<p class="muted">ایجنت در حال کار است… (ساخت کامل ویدیو معمولاً ۵ تا ۱۵ دقیقه طول می‌کشد)</p>';
+  if (isBusy) h += '<p class="muted">' + (p.mode === 'edit' ? 'ایجنت در حال تدوین است… (برای ویدیوی ۳ دقیقه‌ای حدود ۵ تا ۱۰ دقیقه)' : 'ایجنت در حال نوشتن سناریو است…') + '</p>';
   if (p.video_url) h += '<div class="vid" style="margin-top:12px"><video src="' + esc(p.video_url) + '" controls playsinline></video><div style="flex:1;min-width:220px"><h3>کپشن</h3><textarea id="mCapRead" style="min-height:160px">' + esc((p.caption || '') + '\n\n' + (p.hashtags || '')) + '</textarea><div class="actions"><button class="btn ghost" id="mCopy">کپی کپشن</button><a class="btn ghost" href="' + esc(p.video_url) + '" download target="_blank">دانلود ویدیو</a></div></div></div>';
-  if (sb) {
+  if (p.mode === 'edit') {
+    if (qa && (qa.score || qa.notes)) h += '<h3>گزارش تدوینگر</h3><div class="scores"><span>امتیاز ' + (qa.score || '-') + '/۱۰</span>' + (sb && sb.video_seconds ? '<span>طول ' + sb.video_seconds + ' ثانیه</span>' : '') + '</div>' + (qa.notes ? '<p class="muted">' + esc(qa.notes) + '</p>' : '');
+  } else if (sb) {
     if (qa && (qa.hook_score || qa.notes)) h += '<h3>ارزیابی ایجنت</h3><div class="scores"><span>هوک ' + (qa.hook_score || '-') + '/۱۰</span><span>وضوح ' + (qa.clarity_score || '-') + '/۱۰</span><span>ارزش ' + (qa.value_score || '-') + '/۱۰</span><span>تعامل ' + (qa.engagement_score || '-') + '/۱۰</span>' + (sb.stats ? '<span>' + sb.stats.words + ' کلمه ≈ ' + sb.stats.est_seconds + ' ثانیه</span>' : '') + '</div>' + (qa.notes ? '<p class="muted">' + esc(qa.notes) + '</p>' : '');
     h += '<h3>هوک</h3><div class="row"><input id="eHook" value="' + esc(sb.hook && sb.hook.text) + '"><input id="eHi" placeholder="کلمه‌ی هایلایت" value="' + esc(sb.hook && sb.hook.highlight) + '"></div>';
     h += '<h3>صحنه‌ها</h3>' + (sb.scenes || []).map((s, i) => '<div class="scene" data-i="' + i + '"><span class="n">صحنه ' + (i + 1) + '</span>' +
       '<label>متن گوینده</label><textarea class="eVo" style="min-height:60px">' + esc(s.voiceover) + '</textarea>' +
-      '<div class="row"><div><label>برچسب روی تصویر</label><input class="eLb" value="' + esc(s.label) + '"></div><div><label>عکس برند</label><select class="eImg"><option value="-1">تصویر ساخته‌شده با هوش مصنوعی</option>' + imgs.map((im, j) => '<option value="' + j + '"' + (s.use_image === j ? ' selected' : '') + '>' + esc(im.desc || ('عکس ' + (j + 1))) + '</option>').join('') + '</select></div></div>' +
-      '<details><summary class="muted">پرامپت تصویر</summary><textarea class="eVp" dir="ltr" style="min-height:60px">' + esc(s.visual_prompt) + '</textarea></details></div>').join('');
+      '<div class="row"><div><label>برچسب روی تصویر</label><input class="eLb" value="' + esc(s.label) + '"></div><div><label>چه چیزی فیلم بگیرید</label><input class="eVp" value="' + esc(s.visual_prompt) + '"></div></div></div>').join('');
     h += '<h3>دعوت به اقدام</h3><div class="row"><input id="eCt" value="' + esc(sb.cta && sb.cta.text) + '" placeholder="متن روی تصویر"><input id="eCs" value="' + esc(sb.cta && sb.cta.sub) + '" placeholder="خط دوم"></div><label>متن گوینده</label><input id="eCv" value="' + esc(sb.cta && sb.cta.voiceover) + '">';
     h += '<h3>کپشن</h3><textarea id="eCap">' + esc(p.caption || sb.caption || '') + '</textarea>';
-    if (!isBusy) h += '<div class="actions"><button class="btn ghost" id="mSave">ذخیره‌ی تغییرات سناریو</button><button class="btn" id="mProduce">' + (p.video_url ? 'ساخت دوباره‌ی ویدیو' : 'تأیید سناریو و ساخت ویدیو') + '</button></div>';
+    if (!isBusy) h += '<div class="actions"><button class="btn ghost" id="mSave">ذخیره‌ی تغییرات سناریو</button><button class="btn" id="mFilm">فیلمش را گرفتم، آپلود و تدوین</button></div>';
   }
   if (!isBusy) {
-    h += '<h3>بازخورد به ایجنت</h3><textarea id="mFb" placeholder="مثلاً: هوک ضعیف بود، لحن رسمی‌تر، روی قیمت تأکید نکن…">' + esc(p.feedback || '') + '</textarea><div class="actions"><button class="btn ghost" id="mRegen">سناریوی جدید با این بازخورد</button>';
+    h += '<h3>بازخورد به ایجنت</h3><textarea id="mFb" placeholder="' + (p.mode === 'edit' ? 'مثلاً: جمله‌ی اول را نگه دار، کوتاه‌تر کن، قیمت را حذف کن…' : 'مثلاً: هوک ضعیف بود، لحن رسمی‌تر…') + '">' + esc(p.feedback || '') + '</textarea><div class="actions"><button class="btn ghost" id="mRegen">' + (p.mode === 'edit' ? 'تدوین دوباره با این بازخورد' : 'سناریوی جدید با این بازخورد') + '</button>';
     if (['review','approved','rejected'].includes(p.status)) h += '<button class="btn ok" id="mOk">تأیید ویدیو</button><button class="btn bad" id="mNo">رد ویدیو</button>';
     h += '<button class="x" id="mDel">حذف</button></div>';
   }
@@ -302,8 +337,8 @@ function renderProject(){
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = e => busy(e.target, fn); };
   on('mCopy', async () => { await navigator.clipboard.writeText($('#mCapRead').value); toast('کپی شد'); });
   on('mSave', async () => { await saveScript(); toast('ذخیره شد'); });
-  on('mProduce', async () => { await saveScript(); await api('produce', { project_id: p.id }); toast('ساخت ویدیو شروع شد'); await reopen(); });
-  on('mRegen', async () => { await api('regenerate', { project_id: p.id, feedback: $('#mFb').value }); toast('ایجنت سناریوی جدید می‌نویسد'); await reopen(); });
+  on('mFilm', async () => { await saveScript(); const s2 = OPEN.storyboard; $('#eKit').value = p.kit_id; $('#eBrief').value = [s2.hook && s2.hook.text].concat((s2.scenes || []).map(x => x.voiceover), [s2.cta && s2.cta.voiceover]).filter(Boolean).join('\n'); $('#modal').style.display = 'none'; OPEN = null; show('new'); window.scrollTo(0, 0); toast('فایل‌های ویدیو را انتخاب کنید'); });
+  on('mRegen', async () => { await api('regenerate', { project_id: p.id, feedback: $('#mFb').value }); toast(p.mode === 'edit' ? 'ایجنت دوباره تدوین می‌کند' : 'ایجنت سناریوی جدید می‌نویسد'); await reopen(); });
   on('mOk', async () => { await api('review', { project_id: p.id, decision: 'approve', feedback: $('#mFb').value }); toast('تأیید شد'); await reopen(); });
   on('mNo', async () => { await api('review', { project_id: p.id, decision: 'reject', feedback: $('#mFb').value }); toast('رد شد؛ بازخورد برای ویدیوهای بعدی استفاده می‌شود'); await reopen(); });
   on('mDel', async () => { if (!confirm('حذف شود؟')) return; await api('delete_project', { project_id: p.id }); $('#modal').style.display = 'none'; OPEN = null; await load(); });
@@ -312,7 +347,7 @@ async function reopen(){ await load(); await openProject(OPEN.id); }
 async function saveScript(){
   const sb = JSON.parse(JSON.stringify(OPEN.storyboard));
   sb.hook = Object.assign({}, sb.hook, { text: $('#eHook').value.trim(), highlight: $('#eHi').value.trim() });
-  sb.scenes = $$('#mbox .scene').map((el, i) => Object.assign({}, sb.scenes[i], { voiceover: $('.eVo', el).value.trim(), label: $('.eLb', el).value.trim(), visual_prompt: $('.eVp', el).value.trim(), use_image: +$('.eImg', el).value }));
+  sb.scenes = $$('#mbox .scene').map((el, i) => Object.assign({}, sb.scenes[i], { voiceover: $('.eVo', el).value.trim(), label: $('.eLb', el).value.trim(), visual_prompt: $('.eVp', el).value.trim() }));
   sb.cta = { text: $('#eCt').value.trim(), sub: $('#eCs').value.trim(), voiceover: $('#eCv').value.trim() };
   const norm = s => s.replace(/[\s‌.,!?؟،:؛«»"']/g, '');
   if (sb.hook.text && !norm(sb.scenes[0].voiceover).startsWith(norm(sb.hook.text))) sb.scenes[0].voiceover = sb.hook.text + ' ' + sb.scenes[0].voiceover;
@@ -322,12 +357,11 @@ async function saveScript(){
 
 // ---------- style kit ----------
 let KIMGS = [];
-$('#kVoice').innerHTML = VOICES.map(v => '<option>' + v + '</option>').join('');
 $('#kSel').onchange = () => { KIT = DATA.kits.find(k => k.id === +$('#kSel').value); fillKit(KIT); };
 $('#kNew').onclick = () => { KIT = null; fillKit({}); toast('فرم سبک جدید باز شد'); };
 function fillKit(k){
-  $$('#kForm [data-k]').forEach(el => { const v = k[el.dataset.k]; el.value = v == null ? (el.dataset.k === 'auto_daily' ? 0 : el.dataset.k === 'voice' ? 'adam' : el.dataset.k === 'quality' ? 'standard' : '') : v; });
-  const th = k.theme || {}; $('#kColor').value = th.primary || '#ffd400'; $('#kCap').value = th.captionStyle || 'pop';
+  $$('#kForm [data-k]').forEach(el => { const v = k[el.dataset.k]; el.value = v == null ? '' : v; });
+  const th = k.theme || {}; $('#kColor').value = th.primary || '#ffd400'; $('#kCap').value = th.captionStyle || 'pop'; $('#kFrame').value = th.frame || 'none';
   $('#kLogo').dataset.url = k.logo_url || ''; $('#kLogoPrev').innerHTML = k.logo_url ? '<img src="' + esc(k.logo_url) + '" style="height:48px;margin-top:6px;border-radius:8px">' : '';
   $('#kMusic').dataset.url = k.music_url || ''; $('#kMusicPrev').innerHTML = k.music_url ? '<audio controls src="' + esc(k.music_url) + '" style="width:100%;margin-top:6px"></audio>' : '';
   KIMGS = Array.isArray(k.images) ? k.images.slice() : []; renderImgs();
@@ -356,15 +390,15 @@ $('#kLogo').onchange = async e => { if (!e.target.files[0]) return; toast('در 
 $('#kMusic').onchange = async e => { const f = e.target.files[0]; if (!f) return; if (f.size > 9e6) return toast('حداکثر ۹ مگابایت'); toast('در حال آپلود…'); try { const u = await upload(f, 0); e.target.dataset.url = u; $('#kMusicPrev').innerHTML = '<audio controls src="' + esc(u) + '" style="width:100%;margin-top:6px"></audio>'; toast('موزیک آپلود شد'); } catch(err) { toast(err.message, 4000); } };
 $('#kImgIn').onchange = async e => { const files = Array.from(e.target.files); toast('در حال آپلود ' + files.length + ' عکس…', 8000); for (const f of files) { try { KIMGS.push({ url: await upload(f, 1600), desc: '' }); renderImgs(); } catch(err) { toast(err.message, 4000); } } e.target.value = ''; toast('آپلود شد؛ برای هر عکس توضیح بنویسید و ذخیره کنید'); };
 $('#kSave').onclick = e => busy(e.target, async () => {
-  const kit = { id: KIT ? KIT.id : null, theme: { primary: $('#kColor').value, captionStyle: $('#kCap').value }, logo_url: $('#kLogo').dataset.url || '', music_url: $('#kMusic').dataset.url || '', images: KIMGS };
+  const kit = { id: KIT ? KIT.id : null, theme: { primary: $('#kColor').value, captionStyle: $('#kCap').value, frame: $('#kFrame').value }, logo_url: $('#kLogo').dataset.url || '', music_url: $('#kMusic').dataset.url || '', images: KIMGS };
   $$('#kForm [data-k]').forEach(el => kit[el.dataset.k] = el.value);
   const j = await api('save_kit', { kit }); KIT = j.kit; toast('ذخیره شد'); await load();
 });
 
 // ---------- settings ----------
-function fillSettings(){ const s = DATA.settings || {}; $('#sRender').value = s.render_url || ''; $('#sMax').value = s.max_cost_per_video_usd || ''; $('#sTg').value = s.telegram_chat_id || ''; $('#sStd').value = s.video_model_standard || ''; $('#sPrem').value = s.video_model_premium || ''; $('#sTts').value = s.tts_model || ''; }
+function fillSettings(){ const s = DATA.settings || {}; $('#sRender').value = s.render_url || ''; $('#sTg').value = s.telegram_chat_id || ''; $('#sStt').value = s.stt_model || ''; $('#sEd').value = s.editor_model || ''; }
 $('#sSave').onclick = e => busy(e.target, async () => {
-  await api('save_settings', { settings: { render_url: $('#sRender').value, max_cost_per_video_usd: $('#sMax').value, telegram_chat_id: $('#sTg').value, video_model_standard: $('#sStd').value, video_model_premium: $('#sPrem').value, tts_model: $('#sTts').value } });
+  await api('save_settings', { settings: { render_url: $('#sRender').value, telegram_chat_id: $('#sTg').value, stt_model: $('#sStt').value, editor_model: $('#sEd').value } });
   toast('ذخیره شد'); await load();
 });
 $('#logout').onclick = logout;

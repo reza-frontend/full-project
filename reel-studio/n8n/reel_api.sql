@@ -13,7 +13,7 @@ BEGIN
   END IF;
 
   IF pid IS NOT NULL THEN
-    SELECT status IN ('queued', 'scripting', 'producing', 'rendering') AND updated_at > now() - interval '40 minutes'
+    SELECT status IN ('queued', 'scripting', 'producing', 'editing', 'rendering') AND updated_at > now() - interval '40 minutes'
       INTO busy FROM reel.projects WHERE id = pid;
     IF busy IS NULL THEN RETURN jsonb_build_object('ok', false, 'error', 'ویدیو پیدا نشد'); END IF;
   END IF;
@@ -22,7 +22,7 @@ BEGIN
     RETURN jsonb_build_object('ok', true,
       'kits', (SELECT coalesce(jsonb_agg(to_jsonb(x) ORDER BY x.id), '[]'::jsonb) FROM reel.kits x),
       'projects', (SELECT coalesce(jsonb_agg(to_jsonb(x) ORDER BY x.id DESC), '[]'::jsonb) FROM (
-         SELECT id, kit_id, mode, status, title, left(brief, 160) AS brief, video_url, cost_usd, error, created_at, updated_at,
+         SELECT id, kit_id, mode, status, title, left(brief, 160) AS brief, video_url, cost_usd, error, created_at, updated_at, target_seconds,
                 storyboard->'hook'->>'text' AS hook
          FROM reel.projects ORDER BY id DESC LIMIT 80) x),
       'settings', (SELECT jsonb_object_agg(key, value) FROM reel.settings WHERE key NOT IN ('panel_key', 'render_key')));
@@ -63,20 +63,31 @@ BEGIN
   ELSIF a = 'create_project' THEN
     kid := NULLIF(req->>'kit_id', '')::bigint;
     IF NOT EXISTS (SELECT 1 FROM reel.kits WHERE id = kid) THEN RETURN jsonb_build_object('ok', false, 'error', 'اول یک سبک برند بسازید'); END IF;
-    IF coalesce(req->>'mode', '') NOT IN ('auto', 'topic', 'manual') THEN RETURN jsonb_build_object('ok', false, 'error', 'حالت نامعتبر'); END IF;
-    IF req->>'mode' IN ('topic', 'manual') AND length(trim(coalesce(req->>'brief', ''))) < 5 THEN
-      RETURN jsonb_build_object('ok', false, 'error', 'موضوع یا سناریو را بنویسید');
+    IF coalesce(req->>'mode', '') NOT IN ('auto', 'topic', 'edit') THEN RETURN jsonb_build_object('ok', false, 'error', 'حالت نامعتبر'); END IF;
+    IF req->>'mode' = 'topic' AND length(trim(coalesce(req->>'brief', ''))) < 5 THEN
+      RETURN jsonb_build_object('ok', false, 'error', 'موضوع یا ایده را بنویسید');
     END IF;
-    INSERT INTO reel.projects (kit_id, mode, brief, style_notes, target_seconds, auto_produce)
+    IF req->>'mode' = 'edit' AND (jsonb_typeof(req->'clips') <> 'array' OR jsonb_array_length(req->'clips') = 0) THEN
+      RETURN jsonb_build_object('ok', false, 'error', 'اول ویدیو را آپلود کنید');
+    END IF;
+    INSERT INTO reel.projects (kit_id, mode, brief, style_notes, target_seconds, auto_produce, clips)
     VALUES (kid, req->>'mode', coalesce(req->>'brief', ''), coalesce(req->>'style_notes', ''),
-            least(60, greatest(15, coalesce(NULLIF(req->>'target_seconds', '')::int, 30))), coalesce((req->>'auto_produce')::boolean, false))
+            CASE WHEN req->>'mode' = 'edit' THEN least(180, greatest(15, coalesce(NULLIF(req->>'target_seconds', '')::int, 60)))
+                 ELSE least(60, greatest(15, coalesce(NULLIF(req->>'target_seconds', '')::int, 30))) END,
+            false, CASE WHEN req->>'mode' = 'edit' THEN req->'clips' ELSE '[]'::jsonb END)
     RETURNING id INTO pid;
-    RETURN jsonb_build_object('ok', true, 'project_id', pid, 'run', jsonb_build_object('workflow', 'director', 'project_id', pid));
+    RETURN jsonb_build_object('ok', true, 'project_id', pid, 'run', jsonb_build_object('workflow', CASE WHEN req->>'mode' = 'edit' THEN 'editor' ELSE 'director' END, 'project_id', pid));
+
+  ELSIF a = 'upload_ticket' THEN
+    RETURN (SELECT jsonb_build_object('ok', u.value <> '', 'error', CASE WHEN u.value = '' THEN 'آدرس سرویس رندر تنظیم نشده' END,
+              'upload_url', rtrim(u.value, '/') || '/upload/video', 'exp', e.exp, 'token', md5(k.value || ':' || e.exp))
+            FROM reel.settings u, reel.settings k, (SELECT (extract(epoch FROM now())::bigint + 7200)::text AS exp) e
+            WHERE u.key = 'render_url' AND k.key = 'render_key');
 
   ELSIF a = 'regenerate' THEN
     IF busy THEN RETURN jsonb_build_object('ok', false, 'error', 'این ویدیو در حال پردازش است'); END IF;
     UPDATE reel.projects SET feedback = NULLIF(trim(coalesce(req->>'feedback', '')), ''), status = 'queued', updated_at = now() WHERE id = pid;
-    RETURN jsonb_build_object('ok', true, 'run', jsonb_build_object('workflow', 'director', 'project_id', pid));
+    RETURN jsonb_build_object('ok', true, 'run', jsonb_build_object('workflow', (SELECT CASE WHEN mode = 'edit' THEN 'editor' ELSE 'director' END FROM reel.projects WHERE id = pid), 'project_id', pid));
 
   ELSIF a = 'update_script' THEN
     IF busy THEN RETURN jsonb_build_object('ok', false, 'error', 'این ویدیو در حال پردازش است'); END IF;
@@ -88,9 +99,9 @@ BEGIN
 
   ELSIF a = 'produce' THEN
     IF busy THEN RETURN jsonb_build_object('ok', false, 'error', 'این ویدیو در حال پردازش است'); END IF;
-    IF NOT EXISTS (SELECT 1 FROM reel.projects WHERE id = pid AND storyboard IS NOT NULL) THEN RETURN jsonb_build_object('ok', false, 'error', 'سناریو هنوز آماده نیست'); END IF;
-    UPDATE reel.projects SET status = 'script_ready', updated_at = now() WHERE id = pid;
-    RETURN jsonb_build_object('ok', true, 'run', jsonb_build_object('workflow', 'producer', 'project_id', pid));
+    IF NOT EXISTS (SELECT 1 FROM reel.projects WHERE id = pid AND mode = 'edit') THEN RETURN jsonb_build_object('ok', false, 'error', 'برای ساخت ویدیو، فیلم خودتان را آپلود کنید'); END IF;
+    UPDATE reel.projects SET status = 'queued', updated_at = now() WHERE id = pid;
+    RETURN jsonb_build_object('ok', true, 'run', jsonb_build_object('workflow', 'editor', 'project_id', pid));
 
   ELSIF a = 'review' THEN
     UPDATE reel.projects SET status = CASE WHEN req->>'decision' = 'approve' THEN 'approved' ELSE 'rejected' END,
@@ -105,7 +116,7 @@ BEGIN
 
   ELSIF a = 'save_settings' THEN
     UPDATE reel.settings s SET value = trim(req->'settings'->>s.key), updated_at = now()
-    WHERE s.key IN ('render_url', 'telegram_chat_id', 'max_cost_per_video_usd', 'writer_model', 'tts_model', 'video_model_standard', 'video_model_premium')
+    WHERE s.key IN ('render_url', 'telegram_chat_id', 'writer_model', 'editor_model', 'stt_model')
       AND req->'settings' ? s.key;
     RETURN jsonb_build_object('ok', true);
   END IF;
