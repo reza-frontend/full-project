@@ -1,0 +1,9 @@
+{
+  "theme": { "primary": "#FFD400", "captionStyle": "pop", "frame": "solid" },
+  "brand": { "name": "کافه نمونه", "handle": "@sample.cafe" },
+  "clips": [{ "url": "", "width": 1080, "height": 1920 }],
+  "segments": [{ "clip": 0, "start": 0, "end": 3, "zoom": 1 }],
+  "words": [],
+  "graphics": [],
+  "cta": { "text": "فالو کن", "sub": "", "duration": 3 }
+}
